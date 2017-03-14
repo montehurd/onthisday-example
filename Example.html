@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<script>
+<!--//
+
+
+
+
+
+class WMFPage {
+    constructor(title, thumbnail, description, extract) {
+        this.title = title;
+        this.thumbnail = thumbnail;
+        this.description = description;
+        this.extract = extract;
+    }
+}
+
+class WMFEvent {
+    constructor(text, pages, year) {
+        this.text = text;
+        this.pages = pages;
+        this.year = year;
+    }
+}
+
+
+
+
+class WMFPageFragment {
+    constructor(wmfPage, index) {
+        var div = document.createElement('div');
+        div.id = index;
+        div.className = 'page';
+
+        if(wmfPage.title){
+            var title = document.createElement('a');
+            title.id = 'title';
+            title.href = 'https://en.wikipedia.org/wiki/' + wmfPage.title;
+            title.innerHTML = wmfPage.title.replace(/_/g, ' ');
+            div.appendChild(title);
+        }
+
+        if(wmfPage.thumbnail){
+            var img = document.createElement('img');
+            img.id = 'thumbnail';
+            img.src = wmfPage.thumbnail.source;
+            div.appendChild(img);
+        }
+
+        if(wmfPage.description){
+            var description = document.createElement('h4');
+            description.id = 'description';
+            description.innerHTML = wmfPage.description;
+            div.appendChild(description);
+        }
+
+        if(wmfPage.extract){
+            var extract = document.createElement('div');
+            extract.id = 'extract';
+            extract.innerHTML = wmfPage.extract;
+            div.appendChild(extract);
+        }
+
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(div);
+        return fragment;
+    }
+}
+
+class WMFEventFragment {
+    constructor(wmfEvent, index) {
+        var div = document.createElement('div');
+        div.id = index;
+        div.className = 'event';
+
+        let year = wmfEvent.year;
+        if (year){
+            if (year < 0){
+                year = Math.abs(year) + ' BC';
+            }
+            year = year + ' ';
+
+            var yearElement = document.createElement('h1');
+            yearElement.id = 'year';
+            yearElement.innerHTML = year;
+            div.appendChild(yearElement);
+        }
+
+        var title = document.createElement('h1');
+        title.id = 'text';
+        title.innerHTML = wmfEvent.text;
+        div.appendChild(title);
+
+        var pages = document.createElement('div');
+        pages.id = 'pages';
+        wmfEvent.pages.forEach(function (wmfPage, index) {
+            var pageFragment = new WMFPageFragment(wmfPage, index);
+            pages.appendChild(pageFragment);
+        });
+        div.appendChild(pages);
+
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(div);
+        return fragment;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function loadMonths(){
+    var monthSelect = document.getElementById('month');
+    while (monthSelect.hasChildNodes()) { monthSelect.removeChild(monthSelect.lastChild); }
+    for (i = 1; i <= 12; i++){
+        var opt = document.createElement('option');
+        opt.text = i;
+        opt.value = i;
+        monthSelect.appendChild(opt, null);
+    }
+}
+
+function loadDays(){
+    var daySelect = document.getElementById('day');
+    while (daySelect.hasChildNodes()) { daySelect.removeChild(daySelect.lastChild); }
+    var daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+    var monthSelect = document.getElementById('month');
+    for (i = 1; i <= daysInMonth[parseInt(monthSelect.value) - 1]; i++){
+        var opt = document.createElement('option');
+        opt.text = i;
+        opt.value = i;
+        daySelect.appendChild(opt, null);
+    }
+}
+
+
+
+
+
+function monthChosen(sender){
+    loadDays();
+    fetchAndShow();
+}
+
+function dayChosen(sender){
+    fetchAndShow();
+}
+
+function typeChosen(sender){
+    fetchAndShow();
+}
+
+function languageChosen(sender){
+    fetchAndShow();
+}
+
+function orderChosen(sender){
+    fetchAndShow();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+    loadMonths();
+    loadDays();
+    document.getElementsByName('type')[0].checked = 1;
+    document.getElementsByName('order')[0].checked = 1;
+    document.getElementsByName('language')[0].checked = 1;
+    fetchAndShow();
+}, false);
+
+
+
+
+
+
+
+
+
+
+
+
+
+function fetchAndShow(){
+    while (outerContainer.hasChildNodes()) { outerContainer.removeChild(outerContainer.lastChild); }
+
+    let type = document.getElementById('onthisdayForm').type.value;
+    let month = document.getElementById('month').value;
+    let day = document.getElementById('day').value;
+    let order =  document.getElementById('onthisdayForm').order.value;
+    let language =  document.getElementById('onthisdayForm').language.value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `https://${language}.wikipedia.org/api/rest_v1/feed/onthisday/${type}/${month}/${day}`, true);
+    xhr.onload = function (e) {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+
+            let response = JSON.parse(xhr.responseText);
+            let outerContainer = document.getElementById('outerContainer');
+            var events = response[type];
+            if (order == 'ascending'){
+                events = events.reverse();
+            }
+
+            events.forEach(function (thisEvent, index) {
+                var wmfPages = thisEvent.pages.map(function(page) {
+                    return new WMFPage(page.title, page.thumbnail, page.description, page.extract);
+                });
+                var wmfEvent = new WMFEvent(thisEvent.text, wmfPages, thisEvent.year);
+                outerContainer.appendChild(new WMFEventFragment(wmfEvent, index));
+            });
+
+        } else {
+          console.error(xhr.statusText);
+        }
+      }
+    };
+    xhr.onerror = function (e) {
+      console.error(xhr.statusText);
+    };
+    xhr.send(null);
+}
+
+
+
+
+
+
+//-->
+</script>
+
+
+
+
+
+
+<style>
+
+.page {
+    margin-top:20px;
+    border-top-style: dashed;
+    border-top-width: 1;
+    border-top-color: #eeeeee;
+}
+
+a {
+    display: block;
+    padding-top:20px;
+    padding-bottom:20px;
+}
+
+body {
+    background-color: white;
+  	font-family: Sans-Serif;
+    min-width: 1200px;
+}
+
+h1 {
+    color: maroon;
+    margin-top:0px;
+    margin-bottom:20px;
+}
+
+img {
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+	 border-radius: 10px;
+}
+
+#description::first-letter {
+    text-transform: uppercase;
+}
+
+.event {
+    border-width: 1;
+    border-style: solid;
+    padding:28px;
+    border-radius: 10px;
+	display: block;
+	width:400px;
+	margin-left: auto ;
+    margin-right: auto ;
+	margin-bottom: 70px;
+}
+
+#extract {
+	line-height: 150%;
+}
+
+#onthisdayForm {
+    display: inline-block;
+    position: fixed;
+    top: 10px;
+    left: 20px;
+}
+
+table#controls{
+    width:280px;
+}
+
+input[type='radio']{
+     padding:10px;
+}
+
+table tr td{
+    vertical-align: text-top;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+table tr td:nth-child(1){
+    text-align: right;
+    padding-right:10px;
+    font-weight: bold;
+}
+table tr td:nth-child(2){
+    text-align: left;
+}
+
+
+
+
+
+</style>
+</head>
+<body>
+    <form id='onthisdayForm'>
+
+        <table id='controls'>
+            <tr>
+                <td colspan='2' style='text-align:left;'>
+                    This page is a self-contained HTML/CSS/Javascript example of how the Wikipedia <a style='display:inline;' href='https://en.wikipedia.org/api/rest_v1/#!/Feed/aggregatedFeed_0'>OnThisDay</a> endpoint could be used.
+                </td>
+            </tr>
+            <tr>
+                <td>Month:</td>
+                <td>
+                    <select id='month' onchange='monthChosen(this)'></select>
+                </td>
+            </tr>
+            <tr>
+                <td>Day:</td>
+                <td>
+                    <select id='day' onchange='dayChosen(this)'></select>
+                </td>
+            </tr>
+            <tr>
+                <td>Type:</td>
+                <td>
+                    <input type='radio' name='type' onclick='typeChosen(this)' value='births'> Births
+                    <br><input type='radio' name='type' onclick='typeChosen(this)' value='deaths'> Deaths
+                    <br><input type='radio' name='type' onclick='typeChosen(this)' value='selected'> Selected
+                    <br><input type='radio' name='type' onclick='typeChosen(this)' value='events'> Events
+                    <br><input type='radio' name='type' onclick='typeChosen(this)' value='holidays'> Holidays
+                </td>
+            </tr>
+            <tr>
+                <td>Language:</td>
+                <td>
+                    <input type='radio' name='language' onclick='languageChosen(this)' value='EN'> EN
+                    <br><input type='radio' name='language' onclick='languageChosen(this)' value='DE'> DE
+                    <br><input type='radio' name='language' onclick='languageChosen(this)' value='FR'> FR
+                    <br><input type='radio' name='language' onclick='languageChosen(this)' value='SV'> SV
+                </td>
+            </tr>
+            <tr>
+                <td>Order:</td>
+                <td>
+                    <input type='radio' name='order' onclick='orderChosen(this)' value='descending'> Descending
+                    <br><input type='radio' name='order' onclick='orderChosen(this)' value='ascending'> Ascending
+                </td>
+            </tr>
+
+        </table>
+    </form>
+    <br>
+	<div id='outerContainer'>
+	</div>
+</body>
+</html>
