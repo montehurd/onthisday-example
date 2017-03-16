@@ -175,7 +175,8 @@ function fetchAndShow(){
     let order =  document.getElementById('onthisdayForm').order.value;
     let language =  document.getElementById('onthisdayForm').language.value;
 
-    document.getElementById('headline').innerText = type;
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('headline').innerText = `${months[parseInt(month - 1)]} ${day} - ${type}`;
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', `https://${language}.wikipedia.org/api/rest_v1/feed/onthisday/${type}/${month}/${day}`, true);
@@ -322,7 +323,10 @@ table tr td:nth-child(2){
         <table id='controls'>
             <tr>
                 <td colspan='2' style='text-align: left; line-height: 160%'>
-                    This page is a self-contained HTML / CSS / Javascript example of how the Wikipedia <a style='display:inline;' href='https://en.wikipedia.org/api/rest_v1/#!/Feed/aggregatedFeed_0'>OnThisDay</a> endpoint could be used.
+                    This file is a self-contained HTML / CSS / Javascript example of how the Wikipedia <a style='display:inline;' href='https://en.wikipedia.org/api/rest_v1/#!/Feed/aggregatedFeed_0'>OnThisDay</a> endpoint can be used.
+                    <br>
+                    <br>
+                    Options:
                 </td>
             </tr>
             <tr>
