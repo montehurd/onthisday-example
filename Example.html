@@ -64,9 +64,7 @@ class WMFPageFragment {
             div.appendChild(extract);
         }
 
-        var fragment = document.createDocumentFragment();
-        fragment.appendChild(div);
-        return fragment;
+        return document.createDocumentFragment().appendChild(div);;
     }
 }
 
@@ -83,13 +81,13 @@ class WMFEventFragment {
             }
             year = year + ' ';
 
-            var yearElement = document.createElement('h1');
+            var yearElement = document.createElement('h2');
             yearElement.id = 'year';
             yearElement.innerHTML = year;
             div.appendChild(yearElement);
         }
 
-        var title = document.createElement('h1');
+        var title = document.createElement('h2');
         title.id = 'text';
         title.innerHTML = wmfEvent.text;
         div.appendChild(title);
@@ -102,9 +100,7 @@ class WMFEventFragment {
         });
         div.appendChild(pages);
 
-        var fragment = document.createDocumentFragment();
-        fragment.appendChild(div);
-        return fragment;
+        return document.createDocumentFragment().appendChild(div);
     }
 }
 
@@ -267,7 +263,7 @@ body {
     min-width: 1200px;
 }
 
-h1 {
+h2 {
     color: maroon;
     margin-top:0px;
     margin-bottom:20px;
