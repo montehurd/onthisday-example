@@ -6,8 +6,7 @@
 <!--//
 
 
-
-
+// Models 
 
 class WMFPage {
     constructor(title, thumbnail, description, extract) {
@@ -25,9 +24,6 @@ class WMFEvent {
         this.year = year;
     }
 }
-
-
-
 
 class WMFPageFragment {
     constructor(wmfPage, index) {
@@ -105,18 +101,7 @@ class WMFEventFragment {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+// Day and Month form select options
 
 function loadMonths(){
     var monthSelect = document.getElementById('month');
@@ -143,8 +128,7 @@ function loadDays(){
 }
 
 
-
-
+// Form element actions
 
 function monthChosen(sender){
     loadDays();
@@ -167,6 +151,9 @@ function orderChosen(sender){
     fetchAndShow();
 }
 
+
+// Initial form element selections and fetch
+
 document.addEventListener('DOMContentLoaded', function(){
     loadMonths();
     loadDays();
@@ -177,16 +164,7 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 
-
-
-
-
-
-
-
-
-
-
+// Fetch
 
 function fetchAndShow(){
     while (outerContainer.hasChildNodes()) { outerContainer.removeChild(outerContainer.lastChild); }
@@ -196,6 +174,8 @@ function fetchAndShow(){
     let day = document.getElementById('day').value;
     let order =  document.getElementById('onthisdayForm').order.value;
     let language =  document.getElementById('onthisdayForm').language.value;
+
+    document.getElementById('headline').innerText = type;
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', `https://${language}.wikipedia.org/api/rest_v1/feed/onthisday/${type}/${month}/${day}`, true);
@@ -230,22 +210,15 @@ function fetchAndShow(){
 }
 
 
-
-
-
-
 //-->
 </script>
-
-
-
 
 
 
 <style>
 
 .page {
-    margin-top:20px;
+    margin-top: 20px;
     border-top-style: dashed;
     border-top-width: 1;
     border-top-color: #eeeeee;
@@ -253,8 +226,8 @@ function fetchAndShow(){
 
 a {
     display: block;
-    padding-top:20px;
-    padding-bottom:20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 body {
@@ -265,8 +238,8 @@ body {
 
 h2 {
     color: maroon;
-    margin-top:0px;
-    margin-bottom:20px;
+    margin-top: 0px;
+    margin-bottom: 20px;
 }
 
 img {
@@ -280,20 +253,31 @@ img {
     text-transform: uppercase;
 }
 
+#headline, .event {
+    display: block;
+    width: 440px;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+
 .event {
     border-width: 1;
     border-style: solid;
-    padding:28px;
+    padding: 28px;
     border-radius: 10px;
-	display: block;
-	width:400px;
-	margin-left: auto ;
-    margin-right: auto ;
 	margin-bottom: 70px;
 }
 
+#headline {
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 30px;
+    text-transform: capitalize;
+    color: maroon;
+}
+
 #extract {
-	line-height: 150%;
+	line-height: 160%;
 }
 
 #onthisdayForm {
@@ -304,22 +288,22 @@ img {
 }
 
 table#controls{
-    width:280px;
+    width: 280px;
 }
 
 input[type='radio']{
-     padding:10px;
+     padding: 10px;
 }
 
 table tr td{
     vertical-align: text-top;
-    padding-top:5px;
-    padding-bottom:5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 table tr td:nth-child(1){
     text-align: right;
-    padding-right:10px;
+    padding-right: 10px;
     font-weight: bold;
 }
 table tr td:nth-child(2){
@@ -328,17 +312,14 @@ table tr td:nth-child(2){
 
 
 
-
-
 </style>
 </head>
 <body>
     <form id='onthisdayForm'>
-
         <table id='controls'>
             <tr>
-                <td colspan='2' style='text-align:left;'>
-                    This page is a self-contained HTML/CSS/Javascript example of how the Wikipedia <a style='display:inline;' href='https://en.wikipedia.org/api/rest_v1/#!/Feed/aggregatedFeed_0'>OnThisDay</a> endpoint could be used.
+                <td colspan='2' style='text-align: left; line-height: 160%'>
+                    This page is a self-contained HTML / CSS / Javascript example of how the Wikipedia <a style='display:inline;' href='https://en.wikipedia.org/api/rest_v1/#!/Feed/aggregatedFeed_0'>OnThisDay</a> endpoint could be used.
                 </td>
             </tr>
             <tr>
@@ -379,10 +360,10 @@ table tr td:nth-child(2){
                     <br><input type='radio' name='order' onclick='orderChosen(this)' value='ascending'> Ascending
                 </td>
             </tr>
-
         </table>
     </form>
     <br>
+    <h1 id='headline'></h1>
 	<div id='outerContainer'>
 	</div>
 </body>
