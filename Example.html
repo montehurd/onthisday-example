@@ -178,13 +178,12 @@ function fetchAndShow(){
     var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     document.getElementById('headline').innerText = `${months[parseInt(month - 1)]} ${day} - ${type}`;
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', `https://${language}.wikipedia.org/api/rest_v1/feed/onthisday/${type}/${month}/${day}`, true);
-    xhr.onload = function (e) {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-
-            let response = JSON.parse(xhr.responseText);
+    fetch(`https://${language}.wikipedia.org/api/rest_v1/feed/onthisday/${type}/${month}/${day}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Response status not ok')
+            return res.json()
+        })
+        .then((response) => {
             let outerContainer = document.getElementById('outerContainer');
             var events = response[type];
             if (order == 'ascending'){
@@ -198,16 +197,8 @@ function fetchAndShow(){
                 var wmfEvent = new WMFEvent(thisEvent.text, wmfPages, thisEvent.year);
                 outerContainer.appendChild(new WMFEventFragment(wmfEvent, index));
             });
-
-        } else {
-          console.error(xhr.statusText);
-        }
-      }
-    };
-    xhr.onerror = function (e) {
-      console.error(xhr.statusText);
-    };
-    xhr.send(null);
+        })
+        .catch((err) => console.log(err.message))
 }
 
 
